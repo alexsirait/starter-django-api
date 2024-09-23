@@ -3,6 +3,7 @@ from django.db import connection
 from kuliahproject.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from kuliahproject.middleware import jwtRequired
+from django.core.paginator import Paginator
 import datetime
 import jwt
 
@@ -17,11 +18,16 @@ environ.Env.read_env()
 def index(request):
     if request.method == 'GET':
         try:
+            page_number = int(request.GET.get('page', 1))
+            page_size = int(request.GET.get('page_size', 10))
+
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM tbl_mahasiswa")
                 rows = cursor.fetchall()
+
                 mahasiswa_list = [
                     {
+                        "id": row[0],
                         "nim": row[1],
                         "nama_mahasiswa": row[2],
                         "jurusan": row[3],
@@ -33,7 +39,19 @@ def index(request):
                     }
                     for row in rows
                 ]
-            return Response.ok(values=mahasiswa_list, message="List data telah tampil", messagetype="S")
+
+            paginator = Paginator(mahasiswa_list, page_size)
+            page_obj = paginator.get_page(page_number)
+
+            response_data = {
+                "current_page": page_obj.number,
+                "page_size": page_size,
+                "total_pages": paginator.num_pages,
+                "total_items": paginator.count,
+                "items": list(page_obj)
+            }
+
+            return Response.ok(values=response_data, message="List data telah tampil", messagetype="S")
         except Exception as e:
             return Response.badRequest(message=str(e), messagetype="E")
 
