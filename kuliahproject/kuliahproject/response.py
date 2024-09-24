@@ -6,9 +6,10 @@ class Response:
             values = []
 
         return JsonResponse({
-            'values': values,
+            'response': status,
             'message': message,
             'messagetype': messagetype,
+            'values': values,
         }, status=status)
 
     @staticmethod

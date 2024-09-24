@@ -4,6 +4,7 @@ from kuliahproject.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from kuliahproject.middleware import jwtRequired
 from django.core.paginator import Paginator
+from django.urls import reverse
 import datetime
 import jwt
 
@@ -43,12 +44,25 @@ def index(request):
             paginator = Paginator(mahasiswa_list, page_size)
             page_obj = paginator.get_page(page_number)
 
+            base_url = request.build_absolute_uri(request.path)
+            next_page_url = None
+            prev_page_url = None
+
+            if page_obj.has_next():
+                next_page_url = f"{base_url}?page={page_obj.next_page_number()}&page_size={page_size}"
+            
+            if page_obj.has_previous():
+                prev_page_url = f"{base_url}?page={page_obj.previous_page_number()}&page_size={page_size}"
+
             response_data = {
                 "current_page": page_obj.number,
                 "page_size": page_size,
                 "total_pages": paginator.num_pages,
                 "total_items": paginator.count,
-                "items": list(page_obj)
+                "last_page": paginator.num_pages,
+                "next_page_url": next_page_url,
+                "prev_page_url": prev_page_url,
+                "items": list(page_obj),
             }
 
             return Response.ok(values=response_data, message="List data telah tampil", messagetype="S")
