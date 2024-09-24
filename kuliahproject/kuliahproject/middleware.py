@@ -8,7 +8,7 @@ def jwtRequired(fn):
         try:
             decode(args[0].headers.get('Authorization'))
         except Exception as e:
-            return Response.unauthorized()
+            return Response.badRequest(message=str(e), messagetype="E")
         return fn(*args, **kwargs)
 
     return wrapper
