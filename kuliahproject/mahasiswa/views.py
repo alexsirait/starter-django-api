@@ -59,14 +59,14 @@ def index(request):
                     "current_page": page_obj.number,
                     "page_size": page_size,
                     "total_pages": paginator.num_pages,
-                    "total_items": paginator.count,
+                    "total_rows": paginator.count,
                     "last_page": paginator.num_pages,
                     "next_page_url": next_page_url,
                     "prev_page_url": prev_page_url,
-                    "items": list(page_obj),
+                    "rows": list(page_obj),
                 }
 
-                return Response.ok(values=response_data, message="List data telah tampil", messagetype="S")
+                return Response.ok(data=response_data, message="List data telah tampil", messagetype="S")
         except Exception as e:
             return Response.badRequest(message=str(e), messagetype="E")
 
@@ -77,16 +77,16 @@ def insert(request):
             with transaction.atomic():
                 json_data = json.loads(request.body)
                 with connection.cursor() as cursor:
-                    cursor.execute(
+                    aelx = cursor.execute(
                         "INSERT INTO tbl_mahasiswa (nim, nama_mahasiswa, jurusan, tahun_angkatan, alamat, nomor_telepon, nilai_bindo, nilai_eng) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                         (json_data['nim'], json_data['nama_mahasiswa'], json_data['jurusan'], json_data['tahun_angkatan'],
                         json_data['alamat'], json_data['nomor_telepon'], json_data['nilai_bindo'], json_data['nilai_eng'])
                     )
-                    
+
                     cursor.execute("SELECT LAST_INSERT_ID()")
                     new_id = cursor.fetchone()[0]
                     
-                return Response.ok(values={"id": new_id}, message="Added!", messagetype="S")
+                return Response.ok(data={"id": new_id}, message="Added!", messagetype="S")
         except Exception as e:
             return Response.badRequest(message=str(e), messagetype="E")
 
@@ -102,7 +102,7 @@ def show(request, id):
                 if not row:
                     return Response.badRequest(message='Data mahasiswa tidak ditemukan!', messagetype="E")
 
-                mahasiswa_data = {
+                mahasiswa_data = [{
                     "id": row[0],
                     "nim": row[1],
                     "nama_mahasiswa": row[2],
@@ -112,8 +112,8 @@ def show(request, id):
                     "nomor_telepon": row[6],
                     "nilai_bindo": row[7],
                     "nilai_eng": row[8]
-                }
-                return Response.ok(values=mahasiswa_data, message='List data telah tampil', messagetype="S")
+                }]
+                return Response.ok(data=mahasiswa_data, message='List data telah tampil', messagetype="S")
         except Exception as e:
             return Response.badRequest(message=str(e), messagetype="E")
 
@@ -130,7 +130,7 @@ def update(request, id):
                         json_data['alamat'], json_data['nomor_telepon'], json_data['nilai_bindo'], json_data['nilai_eng'], id)
                     )
                     update_id = id
-                return Response.ok(values={"id": update_id}, message="Updated!", messagetype="S")
+                return Response.ok(data={"id": update_id}, message="Updated!", messagetype="S")
         except Exception as e:
             return Response.badRequest(message=str(e), messagetype="E")
 
@@ -141,7 +141,7 @@ def destroy(request, id):
             with transaction.atomic():
                 with connection.cursor() as cursor:
                     cursor.execute("DELETE FROM tbl_mahasiswa WHERE id = %s", [id])
-                return Response.ok(values={"id": id}, message="Deleted!", messagetype="S")
+                return Response.ok(data={"id": id}, message="Deleted!", messagetype="S")
         except Exception as e:
             return Response.badRequest(message=str(e), messagetype="E")
 
@@ -167,7 +167,7 @@ def auth(request):
                 }
                 token = jwt.encode(payload, env('JWT_SECRET'), algorithm='HS256')
 
-                user_data = {
+                user_data = [{
                     "id": row[0],
                     "nim": row[1],
                     "nama_mahasiswa": row[2],
@@ -178,8 +178,8 @@ def auth(request):
                     "nilai_bindo": row[7],
                     "nilai_eng": row[8],
                     "token": token
-                }
+                }]
 
-                return Response.ok(values=user_data, message="Berhasil masuk!", messagetype='S')
+                return Response.ok(data=user_data, message="Berhasil masuk!", messagetype='S')
         except Exception as e:
             return Response.badRequest(message=f'Terjadi kesalahan: {str(e)}')
