@@ -77,7 +77,7 @@ def insert(request):
             with transaction.atomic():
                 json_data = json.loads(request.body)
                 with connection.cursor() as cursor:
-                    aelx = cursor.execute(
+                    cursor.execute(
                         "INSERT INTO tbl_mahasiswa (nim, nama_mahasiswa, jurusan, tahun_angkatan, alamat, nomor_telepon, nilai_bindo, nilai_eng) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                         (json_data['nim'], json_data['nama_mahasiswa'], json_data['jurusan'], json_data['tahun_angkatan'],
                         json_data['alamat'], json_data['nomor_telepon'], json_data['nilai_bindo'], json_data['nilai_eng'])
