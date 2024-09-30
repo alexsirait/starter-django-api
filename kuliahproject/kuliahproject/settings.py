@@ -142,5 +142,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    env('FRONTEND_URL')
+    "http://localhost:9000"
 ]
