@@ -24,20 +24,37 @@ def index(request):
                 page_size = request.GET.get('page_size', None)
 
                 with connection.cursor() as cursor:
-                    cursor.execute("SELECT * FROM tbl_mahasiswa")
+                    # # mysql
+                    # cursor.execute("SELECT * FROM tbl_mahasiswa")
+                    # rows = cursor.fetchall()
+
+                    # mahasiswa_list = [
+                    #     {
+                    #         "id": row[0],
+                    #         "nim": row[1],
+                    #         "nama_mahasiswa": row[2],
+                    #         "jurusan": row[3],
+                    #         "tahun_angkatan": row[4],
+                    #         "alamat": row[5],
+                    #         "nomor_telepon": row[6],
+                    #         "nilai_bindo": row[7],
+                    #         "nilai_eng": row[8]
+                    #     }
+                    #     for row in rows
+                    # ]
+
+                    # postgre
+                    cursor.execute("SELECT * FROM tbl_task")
                     rows = cursor.fetchall()
 
                     mahasiswa_list = [
                         {
                             "id": row[0],
-                            "nim": row[1],
-                            "nama_mahasiswa": row[2],
-                            "jurusan": row[3],
-                            "tahun_angkatan": row[4],
-                            "alamat": row[5],
-                            "nomor_telepon": row[6],
-                            "nilai_bindo": row[7],
-                            "nilai_eng": row[8]
+                            "taskdescription": row[1],
+                            "responsible": row[2],
+                            "responsiblename": row[3],
+                            "startdate": row[4],
+                            "enddate": row[5],
                         }
                         for row in rows
                     ]
